@@ -1,7 +1,6 @@
-"use client";
-
 // @ts-nocheck
 /* eslint-disable */
+"use client";
 
 function Oscillator(e) {
   this.init(e || {});
