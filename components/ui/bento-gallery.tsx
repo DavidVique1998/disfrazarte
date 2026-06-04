@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useRef, useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { X } from "lucide-react"
@@ -159,9 +160,12 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
         </a>
       </div>
 
-      <AnimatePresence>
-        {selectedItem && <ImageModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
-      </AnimatePresence>
+      {typeof window !== "undefined" && createPortal(
+        <AnimatePresence>
+          {selectedItem && <ImageModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   )
 }
