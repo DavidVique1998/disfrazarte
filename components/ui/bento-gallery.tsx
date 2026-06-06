@@ -87,7 +87,7 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
   const y = useTransform(scrollYProgress, [0, 0.2], [30, 0])
 
   return (
-    <section ref={targetRef} className="relative w-full overflow-hidden bg-[#f5f8ff] py-4 sm:py-8 md:py-16">
+    <section ref={targetRef} className="relative w-full bg-[#f5f8ff] py-4 sm:py-8 md:py-16">
       <motion.div style={{ opacity, y }} className="container mx-auto px-4 md:px-12 mb-4 md:mb-12">
         <p className="text-[#1baeea] text-[11px] font-bold tracking-[0.45em] uppercase mb-2 md:mb-3">
           Catálogo
@@ -103,20 +103,16 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
         </div>
       </motion.div>
 
-      {/* Mobile grid: 2-column vertical layout */}
+      {/* Mobile: native horizontal scroll strip with snap */}
       {isMobile ? (
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-2 gap-2 px-4"
+        <div
+          className="flex gap-3 overflow-x-auto px-4 pb-3 snap-x snap-mandatory"
+          style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
         >
-          {imageItems.slice(0, 4).map((item) => (
-            <motion.div
+          {imageItems.map((item) => (
+            <div
               key={item.id}
-              variants={itemVariants}
-              className="relative h-[160px] overflow-hidden cursor-pointer"
+              className="relative flex-shrink-0 w-[62vw] h-[200px] overflow-hidden cursor-pointer snap-start"
               onClick={() => setSelectedItem(item)}
             >
               <img
@@ -131,12 +127,14 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
                 <h3 className="text-sm font-bold text-white leading-tight" style={{ fontFamily: "var(--font-fredoka)" }}>{item.title}</h3>
               </div>
               <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#1baeea] to-[#ff1fa0]" />
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+          {/* trailing spacer so last card snaps correctly */}
+          <div className="flex-shrink-0 w-2" aria-hidden />
+        </div>
       ) : (
         /* Desktop: horizontal drag grid */
-        <div ref={containerRef} className="relative w-full cursor-grab active:cursor-grabbing">
+        <div ref={containerRef} className="relative w-full overflow-hidden cursor-grab active:cursor-grabbing">
           <motion.div
             className="w-max"
             drag="x"
