@@ -1,11 +1,23 @@
 import { ImageResponse } from "next/og";
+import fs from "fs";
+import path from "path";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const alt = "Disfrazarte — Alquiler de Trajes y Disfraces";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Image() {
+  const photoBuffer = fs.readFileSync(
+    path.join(process.cwd(), "public/instagram/ig-07.jpg")
+  );
+  const photoSrc = `data:image/jpeg;base64,${photoBuffer.toString("base64")}`;
+
+  const logoBuffer = fs.readFileSync(
+    path.join(process.cwd(), "public/logo_full.png")
+  );
+  const logoSrc = `data:image/png;base64,${logoBuffer.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -13,71 +25,109 @@ export default async function Image() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "linear-gradient(135deg, #0a0a1a 0%, #12123a 50%, #0a0a1a 100%)",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Background pattern circles */}
-        <div style={{
-          position: "absolute", top: -120, left: -120,
-          width: 500, height: 500, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(27,174,234,0.25) 0%, transparent 70%)",
-        }} />
-        <div style={{
-          position: "absolute", bottom: -120, right: -120,
-          width: 500, height: 500, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,31,160,0.25) 0%, transparent 70%)",
-        }} />
+        {/* Full-bleed costume photo */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `url(${photoSrc})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center top",
+            display: "flex",
+          }}
+        />
 
-        {/* Accent line top */}
-        <div style={{
-          position: "absolute", top: 0, left: 0, right: 0, height: 6,
-          background: "linear-gradient(90deg, #1baeea, #ff1fa0)",
-        }} />
+        {/* Dark gradient — heavy left for text, fades to transparent right */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(90deg, rgba(10,10,26,0.94) 0%, rgba(10,10,26,0.85) 42%, rgba(10,10,26,0.5) 65%, rgba(10,10,26,0.1) 100%)",
+            display: "flex",
+          }}
+        />
 
-        {/* Logo text */}
-        <div style={{
-          display: "flex", alignItems: "center", gap: 0,
-          fontSize: 96, fontWeight: 800, letterSpacing: -2,
-          marginBottom: 32,
-        }}>
-          <span style={{ color: "#1baeea" }}>DISFRAZ</span>
-          <span style={{ color: "#ff1fa0" }}>ARTE</span>
+        {/* Brand color bar top */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 7,
+            background: "linear-gradient(90deg, #1baeea, #ff1fa0)",
+            display: "flex",
+          }}
+        />
+
+        {/* Content — left column */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: "60px 72px",
+          }}
+        >
+          {/* Logo */}
+          <img
+            src={logoSrc}
+            style={{ height: 68, width: 247, objectFit: "contain" }}
+          />
+
+          {/* Tagline */}
+          <div
+            style={{
+              marginTop: 28,
+              fontSize: 34,
+              fontWeight: 700,
+              color: "rgba(255,255,255,0.93)",
+              lineHeight: 1.3,
+              maxWidth: 520,
+            }}
+          >
+            Alquiler de trajes · Ambato & Riobamba
+          </div>
+
+          {/* Sub */}
+          <div
+            style={{
+              marginTop: 14,
+              fontSize: 20,
+              color: "rgba(255,255,255,0.52)",
+              maxWidth: 480,
+            }}
+          >
+            Más de 500 modelos · Envíos a todo Ecuador
+          </div>
+
+          {/* Category pills */}
+          <div style={{ display: "flex", gap: 12, marginTop: 36 }}>
+            {["Desfiles", "Carnaval", "Teatro"].map((label) => (
+              <div
+                key={label}
+                style={{
+                  padding: "8px 22px",
+                  background: "rgba(27,174,234,0.16)",
+                  border: "1px solid rgba(27,174,234,0.42)",
+                  color: "#1baeea",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  display: "flex",
+                }}
+              >
+                {label}
+              </div>
+            ))}
+          </div>
         </div>
-
-        {/* Tagline */}
-        <div style={{
-          fontSize: 28, color: "rgba(255,255,255,0.7)",
-          fontWeight: 500, textAlign: "center",
-          maxWidth: 700, lineHeight: 1.4,
-        }}>
-          Alquiler de trajes y disfraces · Ambato & Riobamba
-        </div>
-
-        {/* Pills */}
-        <div style={{ display: "flex", gap: 16, marginTop: 48 }}>
-          {["+500 modelos", "Desfiles · Carnaval · Teatro", "Envíos a todo Ecuador"].map((t) => (
-            <div key={t} style={{
-              padding: "10px 22px",
-              border: "1px solid rgba(255,255,255,0.15)",
-              background: "rgba(255,255,255,0.06)",
-              color: "rgba(255,255,255,0.6)",
-              fontSize: 16, fontWeight: 600,
-            }}>
-              {t}
-            </div>
-          ))}
-        </div>
-
-        {/* Accent line bottom */}
-        <div style={{
-          position: "absolute", bottom: 0, left: 0, right: 0, height: 6,
-          background: "linear-gradient(90deg, #ff1fa0, #1baeea)",
-        }} />
       </div>
     ),
     { ...size }

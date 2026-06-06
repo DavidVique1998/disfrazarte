@@ -1,0 +1,27 @@
+# Disfrazarte
+
+> Tienda de alquiler de trajes, disfraces y vestuario para eventos en Ecuador.
+
+Disfrazarte ofrece alquiler de trajes de desfile, carnaval, teatro y disfraces especiales con más de 500 modelos disponibles. Servicio en Ambato y Riobamba, con envíos a todo Ecuador.
+
+## Servicios
+
+- Alquiler de trajes de desfile y carnaval
+- Disfraces para teatro, Halloween y fiestas temáticas
+- Vestuario para eventos corporativos y escolares
+- Envíos a domicilio a todo el Ecuador
+
+## Ubicaciones
+
+- **Casa Matriz — Ambato**: 13 de Abril y Mera, Centro Comercial Ambato
+- **Sucursal — Riobamba**: Riobamba, Ecuador
+
+## Contacto
+
+- WhatsApp / Teléfono: +593 96 901 6264
+- Instagram: @disfrazarte_ec
+- Horario: Lunes a Sábado, 9:00 – 19:00
+
+## Web
+
+- URL: https://disfrazarte-delta.vercel.app
