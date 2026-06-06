@@ -142,7 +142,7 @@ const slides = [
     h2: "Desfile",
     accent: "#1baeea",
     sub: "Trajes espectaculares para reinas, comparsas y desfiles folclóricos. Cada vestuario diseñado para brillar.",
-    img: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=2400&auto=format&fit=crop",
+    img: "/instagram/ig-01.jpg",
   },
   {
     type: "scene" as const,
@@ -152,7 +152,7 @@ const slides = [
     h2: "Carnaval",
     accent: "#ff1fa0",
     sub: "Cientos de disfraces vibrantes para los carnavales más espectaculares de Ecuador.",
-    img: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?q=80&w=2400&auto=format&fit=crop",
+    img: "/instagram/ig-05.jpg",
   },
   {
     type: "scene" as const,
@@ -162,7 +162,7 @@ const slides = [
     h2: "Teatro",
     accent: "#1baeea",
     sub: "Vestuario de época, fantasía y drama para obras, producciones audiovisuales y sesiones fotográficas.",
-    img: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2400&auto=format&fit=crop",
+    img: "/instagram/ig-09.jpg",
   },
   {
     type: "scene" as const,
@@ -172,7 +172,7 @@ const slides = [
     h2: "Completo",
     accent: "#ff1fa0",
     sub: "Coronas, cetros, capas y toda la utilería para completar tu traje de la cabeza a los pies.",
-    img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=2400&auto=format&fit=crop",
+    img: "/instagram/ig-13.jpg",
   },
   { type: "catalog" as const },
 ];
@@ -180,14 +180,14 @@ const slides = [
 const SLIDE_COUNT = slides.length; // 6
 
 const catalogItems = [
-  { id: 1, title: "Reina de Carnaval",   desc: "Desfile",    url: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=800&auto=format&fit=crop",  span: "row-span-2" },
-  { id: 2, title: "Fantasía Plumas",     desc: "Carnaval",   url: "https://images.unsplash.com/photo-1535016120720-40c646be5580?q=80&w=800&auto=format&fit=crop",  span: "row-span-1" },
-  { id: 3, title: "Vestuario de Escena", desc: "Teatro",     url: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop",  span: "row-span-1" },
-  { id: 4, title: "Traje de Gala",       desc: "Eventos",    url: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop",  span: "row-span-2 col-span-2" },
-  { id: 5, title: "Disfraz Folclórico",  desc: "Desfile",    url: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?q=80&w=800&auto=format&fit=crop",  span: "row-span-1" },
-  { id: 6, title: "Look Completo",       desc: "Accesorios", url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop",  span: "row-span-1" },
-  { id: 7, title: "Personaje Animado",   desc: "Fiestas",    url: "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?q=80&w=800&auto=format&fit=crop",  span: "row-span-2" },
-  { id: 8, title: "Baile Contemporáneo", desc: "Teatro",     url: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=800&auto=format&fit=crop",  span: "row-span-1 col-span-2" },
+  { id: 1, title: "Reina de Carnaval",   desc: "Desfile",    url: "/instagram/ig-02.jpg", span: "row-span-2" },
+  { id: 2, title: "Fantasía Plumas",     desc: "Carnaval",   url: "/instagram/ig-06.jpg", span: "row-span-1" },
+  { id: 3, title: "Vestuario de Escena", desc: "Teatro",     url: "/instagram/ig-10.jpg", span: "row-span-1" },
+  { id: 4, title: "Traje de Gala",       desc: "Eventos",    url: "/instagram/ig-14.jpg", span: "row-span-2 col-span-2" },
+  { id: 5, title: "Disfraz Folclórico",  desc: "Desfile",    url: "/instagram/ig-17.jpg", span: "row-span-1" },
+  { id: 6, title: "Look Completo",       desc: "Accesorios", url: "/instagram/ig-18.jpg", span: "row-span-1" },
+  { id: 7, title: "Personaje Animado",   desc: "Fiestas",    url: "/instagram/ig-20.jpg", span: "row-span-2" },
+  { id: 8, title: "Baile Contemporáneo", desc: "Teatro",     url: "/instagram/ig-21.jpg", span: "row-span-1 col-span-2" },
 ];
 const INTRO_DWELL = 3; // extra pages of dwell on intro (gallery)
 const TOTAL_PAGES = SLIDE_COUNT + INTRO_DWELL; // 9
@@ -210,8 +210,10 @@ export default function Hero() {
   };
 
   useEffect(() => {
-    renderCanvas("canvas-trails");
-    return () => destroyCanvas();
+    if (window.innerWidth >= 768) {
+      renderCanvas("canvas-trails");
+      return () => destroyCanvas();
+    }
   }, []);
 
   // Stay on intro for first DWELL_FRACTION, then slide through the rest
@@ -256,10 +258,10 @@ export default function Hero() {
     <div ref={ref} style={{ minHeight: `${TOTAL_PAGES * 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden bg-white">
 
-        {/* ─── Mouse trails canvas (covers full hero, behind everything) ── */}
+        {/* ─── Mouse trails canvas (desktop only) ── */}
         <canvas
           id="canvas-trails"
-          className="absolute inset-0 w-full h-full pointer-events-none z-[1]"
+          className="absolute inset-0 w-full h-full pointer-events-none z-[1] hidden md:block"
         />
 
         {/* ─── Progress bar ─────────────────────────────────────────────── */}
@@ -284,14 +286,16 @@ export default function Hero() {
             {/* ── 3D gallery background ── */}
             <InfiniteGallery
               images={[
-                { src: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=800&auto=format&fit=crop", alt: "Desfile" },
-                { src: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop", alt: "Teatro" },
-                { src: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop", alt: "Vestuario" },
-                { src: "https://images.unsplash.com/photo-1535016120720-40c646be5580?q=80&w=800&auto=format&fit=crop", alt: "Carnaval" },
-                { src: "https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?q=80&w=800&auto=format&fit=crop", alt: "Fiestas" },
-                { src: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800&auto=format&fit=crop", alt: "Celebración" },
-                { src: "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?q=80&w=800&auto=format&fit=crop", alt: "Personaje" },
-                { src: "https://images.unsplash.com/photo-1547153760-18fc86324498?q=80&w=800&auto=format&fit=crop&crop=left", alt: "Reina" },
+                { src: "/instagram/ig-01.jpg", alt: "Disfraz 1" },
+                { src: "/instagram/ig-03.jpg", alt: "Disfraz 3" },
+                { src: "/instagram/ig-05.jpg", alt: "Disfraz 5" },
+                { src: "/instagram/ig-07.jpg", alt: "Disfraz 7" },
+                { src: "/instagram/ig-09.jpg", alt: "Disfraz 9" },
+                { src: "/instagram/ig-11.jpg", alt: "Disfraz 11" },
+                { src: "/instagram/ig-13.jpg", alt: "Disfraz 13" },
+                { src: "/instagram/ig-15.jpg", alt: "Disfraz 15" },
+                { src: "/instagram/ig-16.jpg", alt: "Disfraz 16" },
+                { src: "/instagram/ig-19.jpg", alt: "Disfraz 19" },
               ]}
               speed={0.8}
               visibleCount={10}

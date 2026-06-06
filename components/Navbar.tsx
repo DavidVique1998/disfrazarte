@@ -4,10 +4,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const links = [
-  { label: "Servicios", href: "#servicios" },
-  { label: "Catálogo", href: "#catalogo" },
-  { label: "Locales", href: "#locales" },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Catálogo", href: "#catalogo", scrollTo: () => window.scrollTo({ top: window.innerHeight * 8, behavior: "smooth" }) },
+  { label: "Locales", href: "#locales", scrollTo: null },
 ];
 
 export default function Navbar() {
@@ -52,8 +50,9 @@ export default function Navbar() {
           {links.map((l) => (
             <li key={l.href}>
               <a
-                href={l.href}
-                className="text-sm font-semibold tracking-wide text-[#0a0a1a]/60 hover:text-[#0a0a1a] transition-colors duration-300 relative group"
+                href={l.scrollTo ? undefined : l.href}
+                onClick={l.scrollTo ? (e) => { e.preventDefault(); l.scrollTo!(); } : undefined}
+                className="text-sm font-semibold tracking-wide text-[#0a0a1a]/60 hover:text-[#0a0a1a] transition-colors duration-300 relative group cursor-pointer"
               >
                 {l.label}
                 <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1baeea] to-[#ff1fa0] group-hover:w-full transition-all duration-300" />
@@ -98,9 +97,9 @@ export default function Navbar() {
           {links.map((l) => (
             <a
               key={l.href}
-              href={l.href}
-              onClick={() => setMenuOpen(false)}
-              className="text-[#0a0a1a]/80 font-semibold text-lg hover:text-[#1baeea] transition-colors"
+              href={l.scrollTo ? undefined : l.href}
+              onClick={(e) => { if (l.scrollTo) { e.preventDefault(); l.scrollTo(); } setMenuOpen(false); }}
+              className="text-[#0a0a1a]/80 font-semibold text-lg hover:text-[#1baeea] transition-colors cursor-pointer"
             >
               {l.label}
             </a>

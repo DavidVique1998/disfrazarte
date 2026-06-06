@@ -22,7 +22,7 @@ interface InteractiveImageBentoGalleryProps {
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.06 } },
 }
 
 const itemVariants = {
@@ -36,7 +36,7 @@ const itemVariants = {
 const ImageModal = ({ item, onClose }: { item: ImageItem; onClose: () => void }) => (
   <motion.div
     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
     onClick={onClose}
   >
     <motion.div
@@ -55,11 +55,19 @@ const ImageModal = ({ item, onClose }: { item: ImageItem; onClose: () => void })
 const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> = ({ imageItems, title, description }) => {
   const [selectedItem, setSelectedItem] = useState<ImageItem | null>(null)
   const [dragConstraint, setDragConstraint] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const targetRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
   const dragStartX = useRef(0)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
+  }, [])
 
   useEffect(() => {
     const calc = () => {
@@ -79,79 +87,112 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
   const y = useTransform(scrollYProgress, [0, 0.2], [30, 0])
 
   return (
-    <section ref={targetRef} className="relative w-full overflow-hidden bg-[#f5f8ff] py-16 sm:py-24">
-      <motion.div style={{ opacity, y }} className="container mx-auto px-4 md:px-12 mb-12">
-        <p className="text-[#1baeea] text-[11px] font-bold tracking-[0.45em] uppercase mb-3">
+    <section ref={targetRef} className="relative w-full overflow-hidden bg-[#f5f8ff] py-4 sm:py-8 md:py-16">
+      <motion.div style={{ opacity, y }} className="container mx-auto px-4 md:px-12 mb-4 md:mb-12">
+        <p className="text-[#1baeea] text-[11px] font-bold tracking-[0.45em] uppercase mb-2 md:mb-3">
           Catálogo
         </p>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 md:gap-4">
           <h2
-            className="text-5xl md:text-7xl font-bold text-[#0a0a1a] leading-none"
+            className="text-4xl md:text-7xl font-bold text-[#0a0a1a] leading-none"
             style={{ fontFamily: "var(--font-fredoka)" }}
           >
             {title} <span className="gradient-brand-text">traje</span>
           </h2>
-          <p className="text-[#0a0a1a]/40 text-sm max-w-xs md:text-right font-medium">{description}</p>
+          <p className="text-[#0a0a1a]/40 text-xs md:text-sm max-w-xs md:text-right font-medium hidden md:block">{description}</p>
         </div>
       </motion.div>
 
-      <div ref={containerRef} className="relative w-full cursor-grab active:cursor-grabbing">
+      {/* Mobile grid: 2-column vertical layout */}
+      {isMobile ? (
         <motion.div
-          className="w-max"
-          drag="x"
-          dragConstraints={{ left: dragConstraint, right: 0 }}
-          dragElastic={0.05}
-          onPointerDown={(e) => { isDragging.current = false; dragStartX.current = e.clientX }}
-          onPointerMove={(e) => { if (Math.abs(e.clientX - dragStartX.current) > 6) isDragging.current = true }}
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid grid-cols-2 gap-2 px-4"
         >
-          <motion.div
-            ref={gridRef}
-            className="grid grid-rows-[260px_260px] grid-flow-col auto-cols-[minmax(260px,1fr)] gap-3 px-5 md:px-12"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            {imageItems.map((item) => (
-              <motion.div
-                key={item.id}
-                variants={itemVariants}
-                className={cn(
-                  "group relative flex h-full w-full min-w-[260px] cursor-pointer items-end overflow-hidden border border-black/6 p-4 shadow-sm hover:shadow-lg transition-shadow duration-300",
-                  item.span,
-                )}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                onClick={() => { if (!isDragging.current) setSelectedItem(item) }}
-                tabIndex={0}
-                onKeyDown={(e) => e.key === "Enter" && setSelectedItem(item)}
-                aria-label={`Ver ${item.title}`}
-              >
-                <img
-                  src={item.url}
-                  alt={item.title}
-                  draggable={false}
-                  className="absolute inset-0 h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105 pointer-events-none select-none"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                <div className="relative z-10 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                  <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#1baeea] block mb-1">{item.desc}</span>
-                  <h3 className="text-lg font-bold text-white" style={{ fontFamily: "var(--font-fredoka)" }}>{item.title}</h3>
-                </div>
-                {/* Accent line on hover */}
-                <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#1baeea] to-[#ff1fa0] group-hover:w-full transition-all duration-500" />
-              </motion.div>
-            ))}
-          </motion.div>
+          {imageItems.slice(0, 4).map((item) => (
+            <motion.div
+              key={item.id}
+              variants={itemVariants}
+              className="relative h-[160px] overflow-hidden cursor-pointer"
+              onClick={() => setSelectedItem(item)}
+            >
+              <img
+                src={item.url}
+                alt={item.title}
+                draggable={false}
+                className="absolute inset-0 h-full w-full object-cover pointer-events-none select-none"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2">
+                <span className="text-[9px] font-bold tracking-[0.3em] uppercase text-[#1baeea] block mb-0.5">{item.desc}</span>
+                <h3 className="text-sm font-bold text-white leading-tight" style={{ fontFamily: "var(--font-fredoka)" }}>{item.title}</h3>
+              </div>
+              <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#1baeea] to-[#ff1fa0]" />
+            </motion.div>
+          ))}
         </motion.div>
-      </div>
+      ) : (
+        /* Desktop: horizontal drag grid */
+        <div ref={containerRef} className="relative w-full cursor-grab active:cursor-grabbing">
+          <motion.div
+            className="w-max"
+            drag="x"
+            dragConstraints={{ left: dragConstraint, right: 0 }}
+            dragElastic={0.05}
+            onPointerDown={(e) => { isDragging.current = false; dragStartX.current = e.clientX }}
+            onPointerMove={(e) => { if (Math.abs(e.clientX - dragStartX.current) > 6) isDragging.current = true }}
+          >
+            <motion.div
+              ref={gridRef}
+              className="grid grid-rows-[260px_260px] grid-flow-col auto-cols-[minmax(260px,1fr)] gap-3 px-5 md:px-12"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+            >
+              {imageItems.map((item) => (
+                <motion.div
+                  key={item.id}
+                  variants={itemVariants}
+                  className={cn(
+                    "group relative flex h-full w-full min-w-[260px] cursor-pointer items-end overflow-hidden border border-black/6 p-4 shadow-sm hover:shadow-lg transition-shadow duration-300",
+                    item.span,
+                  )}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  onClick={() => { if (!isDragging.current) setSelectedItem(item) }}
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && setSelectedItem(item)}
+                  aria-label={`Ver ${item.title}`}
+                >
+                  <img
+                    src={item.url}
+                    alt={item.title}
+                    draggable={false}
+                    className="absolute inset-0 h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105 pointer-events-none select-none"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  <div className="relative z-10 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                    <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#1baeea] block mb-1">{item.desc}</span>
+                    <h3 className="text-lg font-bold text-white" style={{ fontFamily: "var(--font-fredoka)" }}>{item.title}</h3>
+                  </div>
+                  <div className="absolute bottom-0 left-0 w-0 h-[3px] bg-gradient-to-r from-[#1baeea] to-[#ff1fa0] group-hover:w-full transition-all duration-500" />
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      )}
 
-      <div className="mt-10 px-5 md:px-12 text-center">
+      <div className="mt-6 md:mt-10 px-5 md:px-12 text-center">
         <a
           href="https://wa.me/593969016264?text=Hola!%20Me%20interesa%20ver%20el%20catálogo%20completo"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-8 py-3.5 border-2 border-[#1baeea]/30 text-[#1baeea] font-bold text-sm hover:border-[#1baeea] hover:shadow-[0_4px_20px_rgba(27,174,234,0.2)] transition-all duration-300"
+          className="inline-flex items-center gap-2 px-6 md:px-8 py-3 md:py-3.5 border-2 border-[#1baeea]/30 text-[#1baeea] font-bold text-sm hover:border-[#1baeea] hover:shadow-[0_4px_20px_rgba(27,174,234,0.2)] transition-all duration-300"
         >
           Ver catálogo completo por WhatsApp
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
