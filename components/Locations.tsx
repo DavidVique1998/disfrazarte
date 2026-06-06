@@ -3,13 +3,17 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
+const SHARED = {
+  phone: "096 901 6264",
+  instagram: "@disfrazarte_ec",
+  instagramUrl: "https://www.instagram.com/disfrazarte_ec/",
+  hours: "Lun – Sáb · 9:00 – 19:00",
+};
+
 const locations = [
   {
     city: "Ambato",
     address: "13 de Abril y Mera, Centro Comercial Ambato",
-    phone: "096 901 6264",
-    instagram: "@disfrazarte_ec",
-    hours: "Lun – Sáb · 9:00 – 19:00",
     badge: "Casa Matriz",
     accent: "#1baeea",
     mapSrc:
@@ -19,9 +23,6 @@ const locations = [
   {
     city: "Riobamba",
     address: "Riobamba, Ecuador",
-    phone: "096 901 6264",
-    instagram: "@disfrazarte_ec",
-    hours: "Lun – Sáb · 9:00 – 19:00",
     badge: "¡Nueva sede!",
     accent: "#ff1fa0",
     mapSrc:
@@ -68,7 +69,7 @@ export default function Locations() {
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7 }}
-          className="mb-14"
+          className="mb-10"
         >
           <p className="text-[#1baeea] text-[11px] font-bold tracking-[0.45em] uppercase mb-3">
             Encuéntranos
@@ -82,6 +83,38 @@ export default function Locations() {
           </h2>
         </motion.div>
 
+        {/* Shared contact info — identical for both locations */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="flex flex-wrap items-center gap-x-8 gap-y-3 mb-12 pb-10 border-b border-black/8"
+        >
+          {[
+            { Icon: PhoneIcon, text: SHARED.phone, href: `tel:${SHARED.phone.replace(/\s/g, "")}` },
+            { Icon: InstagramIcon, text: SHARED.instagram, href: SHARED.instagramUrl, external: true },
+            { Icon: ClockIcon, text: SHARED.hours },
+          ].map(({ Icon, text, href, external }) => (
+            <div key={text} className="flex items-center gap-2.5">
+              <div className="w-7 h-7 flex items-center justify-center flex-shrink-0 bg-[#1baeea18] text-[#1baeea]">
+                <Icon />
+              </div>
+              {href ? (
+                <a
+                  href={href}
+                  target={external ? "_blank" : undefined}
+                  rel={external ? "noopener noreferrer" : undefined}
+                  className="text-sm text-[#0a0a1a]/60 hover:text-[#0a0a1a] font-medium transition-colors"
+                >
+                  {text}
+                </a>
+              ) : (
+                <span className="text-sm text-[#0a0a1a]/60 font-medium">{text}</span>
+              )}
+            </div>
+          ))}
+        </motion.div>
+
         {/* Cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {locations.map((loc, i) => (
@@ -89,13 +122,11 @@ export default function Locations() {
               key={loc.city}
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.65, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.65, delay: 0.25 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
               className="group overflow-hidden bg-white border border-black/10 hover:border-black/20 transition-all duration-500"
             >
-              {/* Map embed */}
-              <div
-                className="relative h-72 overflow-hidden border-b border-black/8"
-              >
+              {/* Map embed — no badge overlay, avoids Google Maps UI conflict */}
+              <div className="relative h-64 overflow-hidden">
                 <iframe
                   src={loc.mapSrc}
                   width="100%"
@@ -106,56 +137,41 @@ export default function Locations() {
                   referrerPolicy="no-referrer-when-downgrade"
                   title={`Mapa ${loc.city}`}
                 />
-                {/* Badge */}
-                <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                  <span
-                    className="text-[10px] font-bold tracking-[0.35em] uppercase px-3 py-1.5 rounded-sm text-white shadow-md"
-                    style={{ background: loc.accent }}
-                  >
-                    {loc.badge}
-                  </span>
-                </div>
+              </div>
+
+              {/* Badge strip — outside iframe so it never overlaps map UI */}
+              <div className="px-6 py-2.5" style={{ background: loc.accent }}>
+                <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-white">
+                  {loc.badge}
+                </span>
               </div>
 
               {/* Info panel */}
               <div className="p-6">
                 {/* City name */}
                 <h3
-                  className="text-3xl font-bold mb-5 leading-none"
+                  className="text-3xl font-bold mb-4 leading-none"
                   style={{ fontFamily: "var(--font-fredoka)", color: loc.accent }}
                 >
                   {loc.city}
                 </h3>
 
-                {/* Info rows */}
-                <div className="space-y-3">
-                  {[
-                    { Icon: PinIcon, text: loc.address, href: loc.mapsUrl, external: true },
-                    { Icon: PhoneIcon, text: loc.phone, href: `tel:${loc.phone.replace(/\s/g, "")}` },
-                    { Icon: InstagramIcon, text: loc.instagram, href: "https://www.instagram.com/disfrazarte_ec/", external: true },
-                    { Icon: ClockIcon, text: loc.hours },
-                  ].map(({ Icon, text, href, external }) => (
-                    <div key={text} className="flex items-center gap-3">
-                      <div
-                        className="w-7 h-7 rounded-none flex items-center justify-center flex-shrink-0"
-                        style={{ background: `${loc.accent}18`, color: loc.accent }}
-                      >
-                        <Icon />
-                      </div>
-                      {href ? (
-                        <a
-                          href={href}
-                          target={external ? "_blank" : undefined}
-                          rel={external ? "noopener noreferrer" : undefined}
-                          className="text-sm text-[#0a0a1a]/55 hover:text-[#0a0a1a] font-medium transition-colors"
-                        >
-                          {text}
-                        </a>
-                      ) : (
-                        <span className="text-sm text-[#0a0a1a]/55 font-medium">{text}</span>
-                      )}
-                    </div>
-                  ))}
+                {/* Address */}
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-7 h-7 flex items-center justify-center flex-shrink-0"
+                    style={{ background: `${loc.accent}18`, color: loc.accent }}
+                  >
+                    <PinIcon />
+                  </div>
+                  <a
+                    href={loc.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[#0a0a1a]/55 hover:text-[#0a0a1a] font-medium transition-colors"
+                  >
+                    {loc.address}
+                  </a>
                 </div>
 
                 {/* CTA */}
