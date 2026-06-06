@@ -122,7 +122,7 @@ export default function Services() {
   return (
     <section
       id="servicios"
-      className="py-24 px-5 md:px-12 bg-gradient-to-b from-[#f0f8ff] via-white to-white"
+      className="py-24 px-5 md:px-12 bg-gradient-to-b from-[#f0f8ff] via-white to-white dark:from-[#0d0d20] dark:via-[#0d0d20] dark:to-[#0d0d20]"
     >
       <div className="max-w-7xl mx-auto">
 
@@ -139,7 +139,7 @@ export default function Services() {
               Servicios
             </p>
             <h2
-              className="text-5xl md:text-7xl font-bold text-[#0a0a1a] leading-none"
+              className="text-5xl md:text-7xl font-bold text-[#0a0a1a] dark:text-white leading-none"
               style={{ fontFamily: "var(--font-fredoka)" }}
             >
               Todo lo que
@@ -147,7 +147,7 @@ export default function Services() {
               <span className="gradient-brand-text">necesitas</span>
             </h2>
           </div>
-          <p className="text-[#0a0a1a]/30 text-sm max-w-xs leading-relaxed md:text-right font-medium">
+          <p className="text-[#0a0a1a]/30 dark:text-white/30 text-sm max-w-xs leading-relaxed md:text-right font-medium">
             Envíos a todo Ecuador · Atención personalizada · +500 modelos
           </p>
         </motion.div>

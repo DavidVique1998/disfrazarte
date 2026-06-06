@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const links = [
   { label: "Catálogo", href: "#catalogo", scrollTo: () => window.scrollTo({ top: window.innerHeight * 8, behavior: "smooth" }) },
@@ -32,7 +33,7 @@ export default function Navbar() {
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 md:px-12 py-3 transition-all duration-500 ${
           scrolled
-            ? "bg-white/90 backdrop-blur-md border-b border-black/8 shadow-sm"
+            ? "bg-white/90 dark:bg-[#0d0d20]/90 backdrop-blur-md border-b border-black/8 dark:border-white/10 shadow-sm"
             : "bg-transparent"
         }`}
       >
@@ -52,7 +53,7 @@ export default function Navbar() {
               <a
                 href={l.scrollTo ? undefined : l.href}
                 onClick={l.scrollTo ? (e) => { e.preventDefault(); l.scrollTo!(); } : undefined}
-                className="text-sm font-semibold tracking-wide text-[#0a0a1a]/60 hover:text-[#0a0a1a] transition-colors duration-300 relative group cursor-pointer"
+                className="text-sm font-semibold tracking-wide text-[#0a0a1a]/60 dark:text-white/60 hover:text-[#0a0a1a] dark:hover:text-white transition-colors duration-300 relative group cursor-pointer"
               >
                 {l.label}
                 <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1baeea] to-[#ff1fa0] group-hover:w-full transition-all duration-300" />
@@ -62,6 +63,7 @@ export default function Navbar() {
         </ul>
 
         {/* CTA desktop */}
+        <div className="hidden md:flex items-center gap-3">
         <a
           href="https://wa.me/593969016264?text=Hola!%20Me%20interesa%20alquilar%20un%20traje"
           target="_blank"
@@ -74,10 +76,12 @@ export default function Navbar() {
           </svg>
           Reservar ahora
         </a>
+        </div>
 
-        {/* Mobile hamburger */}
+        {/* Mobile: hamburger */}
+        <div className="md:hidden flex items-center gap-1">
         <button
-          className="md:hidden flex flex-col gap-1.5 p-1"
+          className="flex flex-col gap-1.5 p-1"
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Abrir menú"
         >
@@ -85,6 +89,7 @@ export default function Navbar() {
           <span className={`w-6 h-0.5 bg-[#ff1fa0] transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`} />
           <span className={`w-4 h-0.5 bg-[#1baeea] transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-2 w-6" : ""}`} />
         </button>
+        </div>
       </motion.nav>
 
       {/* Mobile menu */}
@@ -92,14 +97,14 @@ export default function Navbar() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-16 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-black/8 shadow-lg p-6 flex flex-col gap-4"
+          className="fixed top-16 left-0 right-0 z-40 bg-white/95 dark:bg-[#0d0d20]/95 backdrop-blur-md border-b border-black/8 dark:border-white/10 shadow-lg p-6 flex flex-col gap-4"
         >
           {links.map((l) => (
             <a
               key={l.href}
               href={l.scrollTo ? undefined : l.href}
               onClick={(e) => { if (l.scrollTo) { e.preventDefault(); l.scrollTo(); } setMenuOpen(false); }}
-              className="text-[#0a0a1a]/80 font-semibold text-lg hover:text-[#1baeea] transition-colors cursor-pointer"
+              className="text-[#0a0a1a]/80 dark:text-white/80 font-semibold text-lg hover:text-[#1baeea] dark:hover:text-[#1baeea] transition-colors cursor-pointer"
             >
               {l.label}
             </a>
@@ -114,6 +119,11 @@ export default function Navbar() {
           </a>
         </motion.div>
       )}
+
+      {/* Floating theme toggle — above WhatsApp */}
+      <div className="fixed bottom-24 right-6 z-50 w-14 h-14 bg-white dark:bg-[#12122a] border border-black/10 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] flex items-center justify-center transition-all duration-300 hover:shadow-lg">
+        <ThemeToggle />
+      </div>
 
       {/* Floating WhatsApp */}
       <a

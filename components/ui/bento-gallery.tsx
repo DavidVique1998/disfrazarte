@@ -106,19 +106,19 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
   const y = useTransform(scrollYProgress, [0, 0.2], [30, 0])
 
   return (
-    <section ref={targetRef} className="relative w-full bg-[#f5f8ff] py-4 sm:py-8 md:py-16">
+    <section ref={targetRef} className="relative w-full bg-[#f5f8ff] dark:bg-[#12122a] py-4 sm:py-8 md:py-16">
       <motion.div style={{ opacity, y }} className="container mx-auto px-4 md:px-12 mb-4 md:mb-12">
         <p className="text-[#1baeea] text-[11px] font-bold tracking-[0.45em] uppercase mb-2 md:mb-3">
           Catálogo
         </p>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 md:gap-4">
           <h2
-            className="text-4xl md:text-7xl font-bold text-[#0a0a1a] leading-none"
+            className="text-4xl md:text-7xl font-bold text-[#0a0a1a] dark:text-white leading-none"
             style={{ fontFamily: "var(--font-fredoka)" }}
           >
             {title} <span className="gradient-brand-text">traje</span>
           </h2>
-          <p className="text-[#0a0a1a]/40 text-xs md:text-sm max-w-xs md:text-right font-medium hidden md:block">{description}</p>
+          <p className="text-[#0a0a1a]/40 dark:text-white/40 text-xs md:text-sm max-w-xs md:text-right font-medium hidden md:block">{description}</p>
         </div>
       </motion.div>
 
@@ -178,7 +178,7 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
                   key={item.id}
                   variants={itemVariants}
                   className={cn(
-                    "group relative flex h-full w-full min-w-[260px] cursor-pointer items-end overflow-hidden border border-black/6 p-4 shadow-sm hover:shadow-lg transition-shadow duration-300",
+                    "group relative flex h-full w-full min-w-[260px] cursor-pointer items-end overflow-hidden border border-black/6 dark:border-white/10 p-4 shadow-sm hover:shadow-lg transition-shadow duration-300",
                     item.span,
                   )}
                   whileHover={{ scale: 1.02 }}

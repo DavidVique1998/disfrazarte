@@ -82,6 +82,36 @@
   --sidebar-ring: #1baeea;
 }
 
+/* ─── Disfrazarte Brand — Dark Palette ─── */
+.dark {
+  --background: #0d0d20;
+  --foreground: #f0f4ff;
+  --card: #12122a;
+  --card-foreground: #f0f4ff;
+  --popover: #12122a;
+  --popover-foreground: #f0f4ff;
+  --primary: #1baeea;
+  --primary-foreground: #ffffff;
+  --secondary: #ff1fa0;
+  --secondary-foreground: #ffffff;
+  --muted: #1a1a38;
+  --muted-foreground: rgba(240, 244, 255, 0.5);
+  --accent: #ff1fa0;
+  --accent-foreground: #ffffff;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: rgba(240, 244, 255, 0.1);
+  --input: rgba(240, 244, 255, 0.08);
+  --ring: #1baeea;
+  --sidebar: #12122a;
+  --sidebar-foreground: #f0f4ff;
+  --sidebar-primary: #1baeea;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ff1fa0;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(240, 244, 255, 0.1);
+  --sidebar-ring: #1baeea;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -103,6 +133,9 @@
   }
   ::-webkit-scrollbar-track {
     background: #f0f4ff;
+  }
+  .dark ::-webkit-scrollbar-track {
+    background: #1a1a38;
   }
   ::-webkit-scrollbar-thumb {
     background: #1baeea;

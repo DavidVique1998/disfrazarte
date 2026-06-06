@@ -265,7 +265,7 @@ export default function Hero() {
     </motion.div>
 
     <div ref={ref} style={{ minHeight: `${TOTAL_PAGES * 100}vh` }}>
-      <div className="sticky top-0 h-screen bg-white" style={{ overflow: "clip" }}>
+      <div className="sticky top-0 h-screen bg-white dark:bg-[#0d0d20]" style={{ overflow: "clip" }}>
 
         {/* ─── Mouse trails canvas (desktop only) ── */}
         <canvas
@@ -274,7 +274,7 @@ export default function Hero() {
         />
 
         {/* ─── Progress bar ─────────────────────────────────────────────── */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] z-50 bg-black/5">
+        <div className="absolute top-0 left-0 right-0 h-[3px] z-50 bg-black/5 dark:bg-white/5">
           <motion.div
             style={{ width: barW }}
             className="h-full bg-gradient-to-r from-[#1baeea] to-[#ff1fa0]"
@@ -289,7 +289,7 @@ export default function Hero() {
 
           {/* ── Slide 0: Intro ─────────────────────────────────────────── */}
           <div
-            className="w-screen h-full flex-shrink-0 relative flex flex-col items-center justify-center text-center px-6 bg-white overflow-hidden"
+            className="w-screen h-full flex-shrink-0 relative flex flex-col items-center justify-center text-center px-6 bg-white dark:bg-[#0d0d20] overflow-hidden"
             onMouseMove={handleMouseMove}
           >
             {/* ── Gallery background — 3D on desktop, static grid on mobile ── */}
@@ -341,7 +341,7 @@ export default function Hero() {
                   animate={{ y: [0, 10, 0] }}
                   transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                 >
-                  <svg width="18" height="28" viewBox="0 0 18 28" fill="none" className="text-[#0a0a1a]/20">
+                  <svg width="18" height="28" viewBox="0 0 18 28" fill="none" className="text-[#0a0a1a]/20 dark:text-white/20">
                     <rect x="1" y="1" width="16" height="26" rx="8" stroke="currentColor" strokeWidth="1.5" />
                     <rect x="8" y="5" width="2" height="6" rx="1" fill="currentColor" />
                   </svg>
@@ -424,7 +424,7 @@ export default function Hero() {
             })}
 
           {/* ── Slide 5: Catalog ───────────────────────────────────────── */}
-          <div className="w-screen h-full flex-shrink-0 relative bg-[#f5f8ff] flex flex-col justify-center" style={{ overflow: "clip" }}>
+          <div className="w-screen h-full flex-shrink-0 relative bg-[#f5f8ff] dark:bg-[#12122a] flex flex-col justify-center" style={{ overflow: "clip" }}>
             <InteractiveImageBentoGallery
               imageItems={catalogItems}
               title="Elige tu"
@@ -439,7 +439,7 @@ export default function Hero() {
           {slides.map((_, i) => (
             <div
               key={i}
-              className="w-1.5 h-1.5 rounded-full bg-black/15"
+              className="w-1.5 h-1.5 rounded-full bg-black/15 dark:bg-white/15"
             />
           ))}
           {/* Active dot overlay — driven by scroll */}
