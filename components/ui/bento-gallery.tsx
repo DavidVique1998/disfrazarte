@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { X } from "lucide-react"
 
@@ -59,6 +60,7 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
   const containerRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   const targetRef = useRef<HTMLDivElement>(null)
+  const mobileStripRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
   const dragStartX = useRef(0)
 
@@ -81,6 +83,23 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
     window.addEventListener("resize", calc)
     return () => window.removeEventListener("resize", calc)
   }, [imageItems])
+
+  // Non-passive touchmove: prevents iOS page scroll from swallowing horizontal swipe
+  useEffect(() => {
+    if (!isMobile) return;
+    const el = mobileStripRef.current;
+    if (!el) return;
+    let startX = 0, startY = 0;
+    const onStart = (e: TouchEvent) => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; };
+    const onMove = (e: TouchEvent) => {
+      const dx = Math.abs(e.touches[0].clientX - startX);
+      const dy = Math.abs(e.touches[0].clientY - startY);
+      if (dx > dy) e.preventDefault();
+    };
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    return () => { el.removeEventListener("touchstart", onStart); el.removeEventListener("touchmove", onMove); };
+  }, [isMobile]);
 
   const { scrollYProgress } = useScroll({ target: targetRef, offset: ["start end", "end start"] })
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
@@ -106,8 +125,9 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
       {/* Mobile: native horizontal scroll strip with snap */}
       {isMobile ? (
         <div
+          ref={mobileStripRef}
           className="flex gap-3 overflow-x-auto px-4 pb-3 snap-x snap-mandatory"
-          style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
+          style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
         >
           {imageItems.map((item) => (
             <div
@@ -115,11 +135,12 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
               className="relative flex-shrink-0 w-[62vw] h-[200px] overflow-hidden cursor-pointer snap-start"
               onClick={() => setSelectedItem(item)}
             >
-              <img
+              <Image
                 src={item.url}
                 alt={item.title}
-                draggable={false}
-                className="absolute inset-0 h-full w-full object-cover pointer-events-none select-none"
+                fill
+                sizes="62vw"
+                className="object-cover pointer-events-none select-none"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-2 left-2 right-2">
@@ -140,6 +161,7 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
             drag="x"
             dragConstraints={{ left: dragConstraint, right: 0 }}
             dragElastic={0.05}
+            style={{ willChange: "transform" }}
             onPointerDown={(e) => { isDragging.current = false; dragStartX.current = e.clientX }}
             onPointerMove={(e) => { if (Math.abs(e.clientX - dragStartX.current) > 6) isDragging.current = true }}
           >
@@ -166,11 +188,12 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
                   onKeyDown={(e) => e.key === "Enter" && setSelectedItem(item)}
                   aria-label={`Ver ${item.title}`}
                 >
-                  <img
+                  <Image
                     src={item.url}
                     alt={item.title}
-                    draggable={false}
-                    className="absolute inset-0 h-full w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105 pointer-events-none select-none"
+                    fill
+                    sizes="280px"
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105 pointer-events-none select-none"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                   <div className="relative z-10 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">

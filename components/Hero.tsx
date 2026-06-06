@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useMotionValue } from "framer-motion";
+import Image from "next/image";
 import { renderCanvas, destroyCanvas } from "@/components/ui/canvas";
 import InfiniteGallery from "@/components/ui/3d-gallery-photography";
 import InteractiveImageBentoGallery from "@/components/ui/bento-gallery";
@@ -195,6 +196,7 @@ const DWELL_FRACTION = INTRO_DWELL / TOTAL_PAGES; // ~0.333
 
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
@@ -208,6 +210,13 @@ export default function Hero() {
     mouseX.set(e.clientX - left);
     mouseY.set(e.clientY - top);
   };
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     if (window.innerWidth >= 768) {
@@ -256,7 +265,7 @@ export default function Hero() {
     </motion.div>
 
     <div ref={ref} style={{ minHeight: `${TOTAL_PAGES * 100}vh` }}>
-      <div className="sticky top-0 h-screen overflow-hidden bg-white">
+      <div className="sticky top-0 h-screen bg-white" style={{ overflow: "clip" }}>
 
         {/* ─── Mouse trails canvas (desktop only) ── */}
         <canvas
@@ -283,25 +292,35 @@ export default function Hero() {
             className="w-screen h-full flex-shrink-0 relative flex flex-col items-center justify-center text-center px-6 bg-white overflow-hidden"
             onMouseMove={handleMouseMove}
           >
-            {/* ── 3D gallery background ── */}
-            <InfiniteGallery
-              images={[
-                { src: "/instagram/ig-01.jpg", alt: "Disfraz 1" },
-                { src: "/instagram/ig-03.jpg", alt: "Disfraz 3" },
-                { src: "/instagram/ig-05.jpg", alt: "Disfraz 5" },
-                { src: "/instagram/ig-07.jpg", alt: "Disfraz 7" },
-                { src: "/instagram/ig-09.jpg", alt: "Disfraz 9" },
-                { src: "/instagram/ig-11.jpg", alt: "Disfraz 11" },
-                { src: "/instagram/ig-13.jpg", alt: "Disfraz 13" },
-                { src: "/instagram/ig-15.jpg", alt: "Disfraz 15" },
-                { src: "/instagram/ig-16.jpg", alt: "Disfraz 16" },
-                { src: "/instagram/ig-19.jpg", alt: "Disfraz 19" },
-              ]}
-              speed={0.8}
-              visibleCount={10}
-              disableScroll={false}
-              className="absolute inset-0 w-full h-full"
-            />
+            {/* ── Gallery background — 3D on desktop, static grid on mobile ── */}
+            {isMobile ? (
+              <div className="absolute inset-0 grid grid-cols-2 gap-1 overflow-hidden pointer-events-none opacity-25">
+                {["/instagram/ig-01.jpg", "/instagram/ig-03.jpg", "/instagram/ig-05.jpg", "/instagram/ig-07.jpg", "/instagram/ig-09.jpg", "/instagram/ig-11.jpg"].map((src, i) => (
+                  <div key={i} className="relative overflow-hidden">
+                    <Image src={src} alt="" fill sizes="50vw" className="object-cover" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <InfiniteGallery
+                images={[
+                  { src: "/instagram/ig-01.jpg", alt: "Disfraz 1" },
+                  { src: "/instagram/ig-03.jpg", alt: "Disfraz 3" },
+                  { src: "/instagram/ig-05.jpg", alt: "Disfraz 5" },
+                  { src: "/instagram/ig-07.jpg", alt: "Disfraz 7" },
+                  { src: "/instagram/ig-09.jpg", alt: "Disfraz 9" },
+                  { src: "/instagram/ig-11.jpg", alt: "Disfraz 11" },
+                  { src: "/instagram/ig-13.jpg", alt: "Disfraz 13" },
+                  { src: "/instagram/ig-15.jpg", alt: "Disfraz 15" },
+                  { src: "/instagram/ig-16.jpg", alt: "Disfraz 16" },
+                  { src: "/instagram/ig-19.jpg", alt: "Disfraz 19" },
+                ]}
+                speed={0.8}
+                visibleCount={10}
+                disableScroll={false}
+                className="absolute inset-0 w-full h-full"
+              />
+            )}
 
             {/* ── Confetti BEHIND gallery (small, slow, faint) ── */}
             <ConfettiCanvas layer={BACK_LAYER} className="absolute inset-0 w-full h-full pointer-events-none z-0" />
@@ -343,10 +362,12 @@ export default function Hero() {
                   className="w-screen h-full flex-shrink-0 relative overflow-hidden"
                 >
                   {/* Background image */}
-                  <img
+                  <Image
                     src={slide.img}
                     alt={slide.cat}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
                   />
                   {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/10" />
@@ -403,7 +424,7 @@ export default function Hero() {
             })}
 
           {/* ── Slide 5: Catalog ───────────────────────────────────────── */}
-          <div className="w-screen h-full flex-shrink-0 relative bg-[#f5f8ff] overflow-hidden flex flex-col justify-center">
+          <div className="w-screen h-full flex-shrink-0 relative bg-[#f5f8ff] flex flex-col justify-center" style={{ overflow: "clip" }}>
             <InteractiveImageBentoGallery
               imageItems={catalogItems}
               title="Elige tu"
