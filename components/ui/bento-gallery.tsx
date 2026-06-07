@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react"
 import { createPortal } from "react-dom"
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
+import { motion, useScroll, useTransform, AnimatePresence, useInView, LayoutGroup } from "framer-motion"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { X } from "lucide-react"
@@ -101,23 +101,67 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
     return () => { el.removeEventListener("touchstart", onStart); el.removeEventListener("touchmove", onMove); };
   }, [isMobile]);
 
+  const headingRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(headingRef)
+  const [wasSeen, setWasSeen] = useState(false)
+
+  useEffect(() => {
+    if (isInView) setWasSeen(true)
+  }, [isInView])
+
+  const showFloating = wasSeen && !isInView
+
   const { scrollYProgress } = useScroll({ target: targetRef, offset: ["start end", "end start"] })
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
-  const y = useTransform(scrollYProgress, [0, 0.2], [30, 0])
+  const opacity = useTransform(scrollYProgress, [0, 0.15], [0, 1])
+  const y = useTransform(scrollYProgress, [0, 0.15], [30, 0])
 
   return (
+    <LayoutGroup>
+      {/* Floating mini pill — appears when heading scrolls off top */}
+      <AnimatePresence>
+        {showFloating && (
+          <motion.div
+            layoutRoot
+            style={{ position: "fixed", top: 16, left: 16, zIndex: 40 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <motion.div
+              layoutId="gallery-brand"
+              className="flex items-center gap-2 bg-white/90 dark:bg-[#12122a]/90 border border-black/8 dark:border-white/10 shadow-lg px-3 py-1.5"
+              style={{ borderRadius: 999, backdropFilter: "blur(12px)" }}
+              transition={{ type: "spring", stiffness: 280, damping: 28 }}
+            >
+              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#1baeea]">Catálogo</span>
+              <span
+                className="text-sm font-bold text-[#0a0a1a] dark:text-white"
+                style={{ fontFamily: "var(--font-fredoka)" }}
+              >
+                traje
+              </span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     <section ref={targetRef} className="relative w-full bg-[#f5f8ff] dark:bg-[#12122a] py-4 sm:py-8 md:py-16">
       <motion.div style={{ opacity, y }} className="container mx-auto px-4 md:px-12 mb-4 md:mb-12">
         <p className="text-[#1baeea] text-[11px] font-bold tracking-[0.45em] uppercase mb-2 md:mb-3">
           Catálogo
         </p>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 md:gap-4">
-          <h2
-            className="text-4xl md:text-7xl font-bold text-[#0a0a1a] dark:text-white leading-none"
-            style={{ fontFamily: "var(--font-fredoka)" }}
-          >
-            {title} <span className="gradient-brand-text">traje</span>
-          </h2>
+          <div ref={headingRef}>
+            <motion.h2
+              layoutId="gallery-brand"
+              className="text-4xl md:text-7xl font-bold text-[#0a0a1a] dark:text-white leading-none"
+              style={{ fontFamily: "var(--font-fredoka)" }}
+              transition={{ type: "spring", stiffness: 280, damping: 28 }}
+            >
+              {title} <span className="gradient-brand-text">traje</span>
+            </motion.h2>
+          </div>
           <p className="text-[#0a0a1a]/40 dark:text-white/40 text-xs md:text-sm max-w-xs md:text-right font-medium hidden md:block">{description}</p>
         </div>
       </motion.div>
@@ -229,6 +273,7 @@ const InteractiveImageBentoGallery: React.FC<InteractiveImageBentoGalleryProps> 
         document.body
       )}
     </section>
+    </LayoutGroup>
   )
 }
 
