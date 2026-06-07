@@ -31,6 +31,8 @@
 | Mapas | Google Maps embed |
 | SEO | Metadata API, OG image, JSON-LD, robots.txt, sitemap.xml |
 | Analytics | Google Analytics 4 (opcional via `NEXT_PUBLIC_GA_ID`) |
+| Chat IA | Google Gemini Flash Lite (`gemini-flash-lite-latest`) |
+| Tema | next-themes (dark / light / system) |
 | Deploy | Vercel |
 
 ---
@@ -52,9 +54,9 @@ cd disfrazarte
 # 2. Instalar dependencias
 npm install
 
-# 3. Variables de entorno (opcional)
+# 3. Variables de entorno
 cp .env.example .env.local
-# Editar .env.local y agregar NEXT_PUBLIC_GA_ID si tienes GA4
+# Editar .env.local con tus claves (ver tabla abajo)
 
 # 4. Iniciar servidor de desarrollo
 npm run dev
@@ -66,6 +68,7 @@ Abre http://localhost:3000 en el navegador.
 
 | Variable | Requerida | Descripción |
 |----------|-----------|-------------|
+| `GEMINI_API_KEY` | **Sí** | API key de Google Gemini para el chat IA |
 | `NEXT_PUBLIC_GA_ID` | No | ID de Google Analytics 4 (ej. `G-XXXXXXXXXX`) |
 
 ### Scripts disponibles
@@ -76,6 +79,28 @@ npm run build     # Build de producción
 npm run start     # Servidor de producción (requiere build previo)
 npm run lint      # Linter ESLint
 ```
+
+---
+
+## Chat IA
+
+Widget de asistente virtual en la esquina inferior derecha, impulsado por **Google Gemini Flash Lite**:
+
+- Responde preguntas sobre catálogo, reservas, horarios y ubicaciones
+- Chips de sugerencias para arrancar la conversación
+- Soporte completo de dark mode
+- Prompt del sistema entrenado en la información de Disfrazarte
+- Ruta Edge: `POST /api/chat` — sin latencia de cold start
+
+---
+
+## Dark Mode
+
+Implementado con `next-themes` (clase CSS `dark`):
+
+- Toggle flotante en la esquina inferior derecha
+- Detecta preferencia del sistema por defecto
+- Paleta oscura: fondo `#0d0d20`, cards `#12122a`, texto `#f0f4ff`
 
 ---
 
