@@ -80,11 +80,11 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* FAB — bottom left */}
+      {/* FAB — above theme toggle */}
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Cerrar chat" : "Abrir asistente"}
-        className="fixed bottom-6 left-6 z-50 w-14 h-14 flex items-center justify-center text-white transition-transform duration-200 hover:scale-105 active:scale-95"
+        className="fixed bottom-40 right-6 z-50 w-14 h-14 flex items-center justify-center text-white transition-transform duration-200 hover:scale-105 active:scale-95"
         style={{
           background: open
             ? "#0a0a1a"
@@ -109,7 +109,7 @@ export default function ChatWidget() {
       {/* Panel */}
       {open && (
         <div
-          className="fixed bottom-24 left-6 z-50 flex flex-col overflow-hidden bg-white dark:bg-[#12122a] border border-black/8 dark:border-white/8"
+          className="fixed bottom-56 right-6 z-50 flex flex-col overflow-hidden bg-white dark:bg-[#12122a] border border-black/8 dark:border-white/8"
           style={{
             width: "min(360px, calc(100vw - 32px))",
             maxHeight: 520,
