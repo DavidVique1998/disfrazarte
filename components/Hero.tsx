@@ -286,33 +286,41 @@ export default function Hero() {
   // Section 4 starts appearing at scroll ~0.80; morph begins there, lands at 1.0
   const MORPH_START = 0.80;
 
+  // Transition completes at 0.283 — before gallery starts at DWELL_FRACTION (0.333)
+  const TRANSITION_END = DWELL_FRACTION - 0.05;
+
   const logoBOpacity = useTransform(
     scrollYProgress,
-    [0, LOGO_A_OUT, DWELL_FRACTION * 0.9, DWELL_FRACTION + 0.04, 0.995, 1.0],
-    [0, 0,          1,                     1,                     1,     0]
+    [0, LOGO_A_OUT, TRANSITION_END, 0.995, 1.0],
+    [0, 0,          1,              1,     0]
   );
-  // Hold keyframe at MORPH_START prevents interpolation drift in sections 1-3
   const logoBLeftMV = useTransform(
     scrollYProgress,
-    [LOGO_A_OUT, DWELL_FRACTION + 0.08, MORPH_START, 1.0],
-    [lbBigLeft,  LB_FINAL_LEFT,         LB_FINAL_LEFT, LB_CATALOG_LEFT]
+    [LOGO_A_OUT, TRANSITION_END, MORPH_START, 1.0],
+    [lbBigLeft,  LB_FINAL_LEFT,  LB_FINAL_LEFT, LB_CATALOG_LEFT]
   );
   const logoBTopMV = useTransform(
     scrollYProgress,
-    [LOGO_A_OUT, DWELL_FRACTION + 0.08, MORPH_START, 1.0],
-    [lbBigTop,   LB_FINAL_TOP,          LB_FINAL_TOP,  LB_CATALOG_TOP]
+    [LOGO_A_OUT, TRANSITION_END, MORPH_START, 1.0],
+    [lbBigTop,   LB_FINAL_TOP,   LB_FINAL_TOP,  LB_CATALOG_TOP]
   );
   const logoBWidthMV = useTransform(
     scrollYProgress,
-    [LOGO_A_OUT, DWELL_FRACTION + 0.08, MORPH_START, 1.0],
-    [lbBigW,     LB_FINAL_W,            LB_FINAL_W,    LB_CATALOG_W]
+    [LOGO_A_OUT, TRANSITION_END, MORPH_START, 1.0],
+    [lbBigW,     LB_FINAL_W,     LB_FINAL_W,    LB_CATALOG_W]
   );
   const logoBTopPx = useMotionTemplate`${logoBTopMV}px`;
   const logoBLeftPx = useMotionTemplate`${logoBLeftMV}px`;
   const logoBWidthPx = useMotionTemplate`${logoBWidthMV}px`;
-  // Dark mode: white (invert=1) → original; Light mode: black (invert=0,bright=0) → original
-  const logoBInvert = useTransform(scrollYProgress, [LOGO_A_OUT, DWELL_FRACTION + 0.08], [isDark ? 1 : 0, 0]);
-  const logoBBright = useTransform(scrollYProgress, [LOGO_A_OUT, DWELL_FRACTION + 0.08], [0, 1]);
+  // Hold theme-appropriate color through all gallery sections; transition to original only at catalog morph
+  const logoBInvert = useTransform(scrollYProgress,
+    [LOGO_A_OUT, MORPH_START, 0.95],
+    [isDark ? 1 : 0, isDark ? 1 : 0, 0]
+  );
+  const logoBBright = useTransform(scrollYProgress,
+    [LOGO_A_OUT, MORPH_START, 0.95],
+    [0, 0, 1]
+  );
   const logoBFilter = useMotionTemplate`brightness(${logoBBright}) invert(${logoBInvert})`;
 
   // Active dot x position (each dot is 14px wide including gap)
