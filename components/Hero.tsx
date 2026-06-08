@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform, useMotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useMotionTemplate } from "framer-motion";
 import Image from "next/image";
 import { renderCanvas, destroyCanvas } from "@/components/ui/canvas";
 import InfiniteGallery from "@/components/ui/3d-gallery-photography";
@@ -197,6 +197,8 @@ const DWELL_FRACTION = INTRO_DWELL / TOTAL_PAGES; // ~0.333
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [vpW, setVpW] = useState(1440);
+  const [vpH, setVpH] = useState(900);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
@@ -219,6 +221,13 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
+    const update = () => { setVpW(window.innerWidth); setVpH(window.innerHeight); };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  useEffect(() => {
     if (window.innerWidth >= 768) {
       renderCanvas("canvas-trails");
       return () => destroyCanvas();
@@ -235,12 +244,67 @@ export default function Hero() {
   // Progress bar
   const barW = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
-  // Logo overlay: visible during dwell, fades out as slides begin, stays hidden after
+  // Logo A (ghost/exclusion): fully gone before Logo B appears — no overlap
+  const LOGO_A_OUT = DWELL_FRACTION * 0.65; // ~0.217
   const logoOpacity = useTransform(
     scrollYProgress,
-    [0, DWELL_FRACTION * 0.7, DWELL_FRACTION, 1],
+    [0, DWELL_FRACTION * 0.45, LOGO_A_OUT, 1],
     [1, 1, 0, 0]
   );
+
+  // Logo B: animated white logo — starts large+centered, morphs to small+top-left, then lands in catalog header
+  const LB_FINAL_W = 130;
+  const LB_FINAL_LEFT = 64;
+  const LB_FINAL_TOP = 20;
+
+  // Catalog logo position — derived from bento-gallery CSS layout
+  // container mx-auto uses Tailwind v4 max-widths: sm=640, md=768, lg=1024, xl=1280, 2xl=1536
+  const containerMaxW = vpW >= 1536 ? 1536 : vpW >= 1280 ? 1280 : vpW >= 1024 ? 1024 : vpW >= 768 ? 768 : vpW >= 640 ? 640 : vpW;
+  const containerLeftMargin = Math.max(0, (vpW - containerMaxW) / 2);
+  const catalogPaddingLeft = vpW >= 768 ? 48 : 16; // md:px-12 = 48px, px-4 = 16px
+  const LB_CATALOG_LEFT = containerLeftMargin + catalogPaddingLeft;
+
+  // bento section: py-16 top+bottom (128) + brand(44) + heading(72) + mb-12(48) + grid(532) + button(88) ≈ 912px
+  // catalog slide: flex flex-col justify-center → section top = (vpH - 912) / 2
+  const BENTO_H = 912;
+  const LB_CATALOG_TOP = Math.max(8, (vpH - BENTO_H) / 2 + 64);
+  const LB_CATALOG_W = 120; // matches h-7 (28px) × ~4.3 aspect ratio
+
+  const lbBigW = Math.min(vpW * 0.72, 760);
+  const lbBigLeft = (vpW - lbBigW) / 2;
+  const lbBigTop = vpH / 2 - lbBigW / 9;
+
+  // Section 4 starts appearing at scroll ~0.80; morph begins there, lands at 1.0
+  const MORPH_START = 0.80;
+
+  const logoBOpacity = useTransform(
+    scrollYProgress,
+    [0, LOGO_A_OUT, DWELL_FRACTION * 0.9, DWELL_FRACTION + 0.04, 0.995, 1.0],
+    [0, 0,          1,                     1,                     1,     0]
+  );
+  // Hold keyframe at MORPH_START prevents interpolation drift in sections 1-3
+  const logoBLeftMV = useTransform(
+    scrollYProgress,
+    [LOGO_A_OUT, DWELL_FRACTION + 0.08, MORPH_START, 1.0],
+    [lbBigLeft,  LB_FINAL_LEFT,         LB_FINAL_LEFT, LB_CATALOG_LEFT]
+  );
+  const logoBTopMV = useTransform(
+    scrollYProgress,
+    [LOGO_A_OUT, DWELL_FRACTION + 0.08, MORPH_START, 1.0],
+    [lbBigTop,   LB_FINAL_TOP,          LB_FINAL_TOP,  LB_CATALOG_TOP]
+  );
+  const logoBWidthMV = useTransform(
+    scrollYProgress,
+    [LOGO_A_OUT, DWELL_FRACTION + 0.08, MORPH_START, 1.0],
+    [lbBigW,     LB_FINAL_W,            LB_FINAL_W,    LB_CATALOG_W]
+  );
+  const logoBTopPx = useMotionTemplate`${logoBTopMV}px`;
+  const logoBLeftPx = useMotionTemplate`${logoBLeftMV}px`;
+  const logoBWidthPx = useMotionTemplate`${logoBWidthMV}px`;
+  // Filter: white (brightness(0) invert(1)) → original colors as it lands in catalog
+  const logoBInvert = useTransform(scrollYProgress, [0.85, 0.97], [1, 0]);
+  const logoBBright = useTransform(scrollYProgress, [0.85, 0.97], [0, 1]);
+  const logoBFilter = useMotionTemplate`brightness(${logoBBright}) invert(${logoBInvert})`;
 
   // Active dot x position (each dot is 14px wide including gap)
   const dotX = useTransform(
@@ -251,7 +315,7 @@ export default function Hero() {
 
   return (
     <>
-    {/* ── Fixed logo overlay — mix-blend-mode: exclusion (Shadway style) ── */}
+    {/* ── Fixed logo ghost — exclusion blend (intro only) ── */}
     <motion.div
       className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
       style={{ opacity: logoOpacity, mixBlendMode: "exclusion" }}
@@ -263,6 +327,25 @@ export default function Hero() {
         style={{ filter: "invert(1) brightness(2) saturate(0)" }}
       />
     </motion.div>
+
+    {/* ── Logo B: morphs from large-center to small-top-left ── */}
+    {!isMobile && (
+      <motion.img
+        src="/logo_full.png"
+        alt="Disfrazarte"
+        style={{
+          position: "fixed",
+          top: logoBTopPx,
+          left: logoBLeftPx,
+          width: logoBWidthPx,
+          height: "auto",
+          opacity: logoBOpacity,
+          filter: logoBFilter,
+          zIndex: 41,
+          pointerEvents: "none",
+        }}
+      />
+    )}
 
     <div ref={ref} style={{ minHeight: `${TOTAL_PAGES * 100}vh` }}>
       <div className="sticky top-0 h-screen bg-white dark:bg-[#0d0d20]" style={{ overflow: "clip" }}>
