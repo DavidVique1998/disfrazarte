@@ -199,7 +199,6 @@ export default function Hero() {
   const [isMobile, setIsMobile] = useState(false);
   const [vpW, setVpW] = useState(1440);
   const [vpH, setVpH] = useState(900);
-  const [isDark, setIsDark] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
@@ -228,13 +227,6 @@ export default function Hero() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
-    check();
-    const obs = new MutationObserver(check);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => obs.disconnect();
-  }, []);
 
   useEffect(() => {
     if (window.innerWidth >= 768) {
@@ -312,16 +304,6 @@ export default function Hero() {
   const logoBTopPx = useMotionTemplate`${logoBTopMV}px`;
   const logoBLeftPx = useMotionTemplate`${logoBLeftMV}px`;
   const logoBWidthPx = useMotionTemplate`${logoBWidthMV}px`;
-  // Hold theme-appropriate color through all gallery sections; transition to original only at catalog morph
-  const logoBInvert = useTransform(scrollYProgress,
-    [LOGO_A_OUT, MORPH_START, 0.95],
-    [isDark ? 1 : 0, isDark ? 1 : 0, 0]
-  );
-  const logoBBright = useTransform(scrollYProgress,
-    [LOGO_A_OUT, MORPH_START, 0.95],
-    [0, 0, 1]
-  );
-  const logoBFilter = useMotionTemplate`brightness(${logoBBright}) invert(${logoBInvert})`;
 
   // Active dot x position (each dot is 14px wide including gap)
   const dotX = useTransform(
@@ -357,7 +339,7 @@ export default function Hero() {
           width: logoBWidthPx,
           height: "auto",
           opacity: logoBOpacity,
-          filter: logoBFilter,
+
           zIndex: 41,
           pointerEvents: "none",
         }}
