@@ -199,6 +199,7 @@ export default function Hero() {
   const [isMobile, setIsMobile] = useState(false);
   const [vpW, setVpW] = useState(1440);
   const [vpH, setVpH] = useState(900);
+  const [isDark, setIsDark] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
@@ -225,6 +226,14 @@ export default function Hero() {
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
+  }, []);
+
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
   }, []);
 
   useEffect(() => {
@@ -301,9 +310,8 @@ export default function Hero() {
   const logoBTopPx = useMotionTemplate`${logoBTopMV}px`;
   const logoBLeftPx = useMotionTemplate`${logoBLeftMV}px`;
   const logoBWidthPx = useMotionTemplate`${logoBWidthMV}px`;
-  // White while large+centered → original colors as it shrinks to top-left
-  // Stays original through sections 1-3 and catalog (visible on both light+dark)
-  const logoBInvert = useTransform(scrollYProgress, [LOGO_A_OUT, DWELL_FRACTION + 0.08], [1, 0]);
+  // Dark mode: white (invert=1) → original; Light mode: black (invert=0,bright=0) → original
+  const logoBInvert = useTransform(scrollYProgress, [LOGO_A_OUT, DWELL_FRACTION + 0.08], [isDark ? 1 : 0, 0]);
   const logoBBright = useTransform(scrollYProgress, [LOGO_A_OUT, DWELL_FRACTION + 0.08], [0, 1]);
   const logoBFilter = useMotionTemplate`brightness(${logoBBright}) invert(${logoBInvert})`;
 
